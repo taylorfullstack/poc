@@ -30,6 +30,11 @@ public class UserController {
         this.jwtService = jwtService;
     }
 
+    @GetMapping("/online-users")
+    public List<String> getOnlineUsers() {
+        return userService.getOnlineUsers();
+    }
+
     @GetMapping("/users")
     public List<User> getAllUsers() {
         return userService.getAllUsers();
@@ -52,10 +57,19 @@ public class UserController {
             logger.debug("Login attempt for user: {}", loginDTO.getEmailOrUsername());
             Authentication authentication = userService.authenticate(loginDTO);
             String token = jwtService.generateToken(authentication);
+            logger.debug("LOGGING in user with USERNAME: {}", authentication.getName());
             return ResponseEntity.ok(Collections.singletonMap("token", token));
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDTO.getEmailOrUsername());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.OK)
+    public void logout(Authentication authentication) {
+        String username = authentication.getName();
+        logger.debug("Logging out user: {}", username);
+        userService.logout(username);
     }
 }

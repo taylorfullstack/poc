@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -40,8 +41,10 @@ public class UserService {
         }
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginDTO.getEmailOrUsername(), loginDTO.getPassword()));
+                    new UsernamePasswordAuthenticationToken(user.getUsername(), loginDTO.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            user.setOnline(true);
+            userRepository.save(user);
             return authentication;
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDTO.getEmailOrUsername());
@@ -51,6 +54,13 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public List<String> getOnlineUsers() {
+        return userRepository.findByOnline(true)
+                .stream()
+                .map(User::getUsername)
+                .collect(Collectors.toList());
     }
 
     public UserDTO getUserProfile(String identifier) {
@@ -65,5 +75,11 @@ public class UserService {
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername(user.getUsername());
         return userDTO;
+    }
+
+    public void logout(String username) {
+        User user = userRepository.findByUsername(username);
+        user.setOnline(false);
+        userRepository.save(user);
     }
 }
