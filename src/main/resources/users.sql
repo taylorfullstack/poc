@@ -1,2 +1,2 @@
-INSERT INTO public.users (username, email, password) VALUES ('heather', 'ht@oc.fr', 'code1234');
-INSERT INTO public.users (username, email, password) VALUES ('tester', 'test@oc.fr', 'test1234');
+INSERT INTO public.users (username, email, password, online, role) VALUES ('heather', 'ht@oc.fr', 'code1234', false, 'EMPLOYEE');
+INSERT INTO public.users (username, email, password, online, role) VALUES ('emma', 'emma@oc.fr', 'emma1234', false, 'CLIENT');

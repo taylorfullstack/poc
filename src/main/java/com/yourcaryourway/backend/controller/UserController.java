@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
-import com.yourcaryourway.backend.model.User;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,9 +29,9 @@ public class UserController {
         this.jwtService = jwtService;
     }
 
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    @GetMapping("/online-users")
+    public List<UserDTO> getOnlineUsers() {
+        return userService.getOnlineUsers();
     }
 
     @GetMapping("/profile")
@@ -52,10 +51,20 @@ public class UserController {
             logger.debug("Login attempt for user: {}", loginDTO.getEmailOrUsername());
             Authentication authentication = userService.authenticate(loginDTO);
             String token = jwtService.generateToken(authentication);
+            logger.debug("LOGGING in user with USERNAME: {}", authentication.getName());
             return ResponseEntity.ok(Collections.singletonMap("token", token));
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDTO.getEmailOrUsername());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Map<String, Boolean>>  logout(Authentication authentication) {
+        String username = authentication.getName();
+        logger.debug("Logging out user: {}", username);
+        userService.logout(username);
+        return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
 }
