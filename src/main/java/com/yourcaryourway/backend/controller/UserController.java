@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
-import com.yourcaryourway.backend.model.User;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,13 +30,8 @@ public class UserController {
     }
 
     @GetMapping("/online-users")
-    public List<String> getOnlineUsers() {
+    public List<UserDTO> getOnlineUsers() {
         return userService.getOnlineUsers();
-    }
-
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
     }
 
     @GetMapping("/profile")
@@ -67,9 +61,10 @@ public class UserController {
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    public void logout(Authentication authentication) {
+    public ResponseEntity<Map<String, Boolean>>  logout(Authentication authentication) {
         String username = authentication.getName();
         logger.debug("Logging out user: {}", username);
         userService.logout(username);
+        return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
 }

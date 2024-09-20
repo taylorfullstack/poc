@@ -52,14 +52,15 @@ public class UserService {
         }
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    public List<String> getOnlineUsers() {
+    public List<UserDTO> getOnlineUsers() {
         return userRepository.findByOnline(true)
                 .stream()
-                .map(User::getUsername)
+                .map(user -> {
+                    UserDTO userDTO = new UserDTO();
+                    userDTO.setUsername(user.getUsername());
+                    userDTO.setRole(user.getRole());
+                    return userDTO;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -74,6 +75,7 @@ public class UserService {
         }
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername(user.getUsername());
+        userDTO.setRole(user.getRole());
         return userDTO;
     }
 
